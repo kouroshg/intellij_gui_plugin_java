@@ -136,7 +136,7 @@ public class UploaderGUI extends DialogWrapper {
                 false
         );
 
-        fileChooserDescriptor.withFileFilter(f-> extensionFilter(f));
+//        fileChooserDescriptor.withFileFilter(f-> extensionFilter(f));
         fileChooserDescriptor.setTitle( "Select the video you wish to upload");
         fileChooserDescriptor.setDescription("Your selected file will be uploaded");
         FileChooser.chooseFile(fileChooserDescriptor, null, null, callback);
