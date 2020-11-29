@@ -1,14 +1,17 @@
 package com.speacode.uploader;
 
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.Consumer;
 import org.jetbrains.annotations.Nullable;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.ui.ValidationInfo;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.uiDesigner.core.AbstractLayout;
 import com.intellij.util.ui.GridBag;
@@ -20,7 +23,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.*;
 
 public class UploaderGUI extends DialogWrapper {
 
@@ -28,7 +31,7 @@ public class UploaderGUI extends DialogWrapper {
     private JTextField txtPath = new JTextField();
     private JButton btnBrowse = new JButton();
     private JTextField txtTitle = new JTextField();
-    private VirtualFile file;
+
 
     protected UploaderGUI(@Nullable Project project, boolean canBeParent) {
         super(project, canBeParent);
@@ -85,7 +88,8 @@ public class UploaderGUI extends DialogWrapper {
     private class BrowseFileButtonClickListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            txtPath.setText( fileBrowser());
+//            txtPath.setText(fileBrowser());
+            fileBrowserNative((file)->{txtPath.setText(file.getPath());});
         }
     }
 
@@ -119,5 +123,26 @@ public class UploaderGUI extends DialogWrapper {
         NotificationGroup ng = new NotificationGroup("com.speacode.uploader", NotificationDisplayType.STICKY_BALLOON, true);
         Notification notification = new Notification(ng.getDisplayId(),title,content,type);
         notification.notify(null);
+    }
+
+    private void fileBrowserNative(Consumer<VirtualFile> callback)
+    {
+        FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(
+                true,
+                false,
+                false,
+                false,
+                false,
+                false
+        );
+
+        fileChooserDescriptor.withFileFilter(f-> extensionFilter(f));
+        fileChooserDescriptor.setTitle( "Select the video you wish to upload");
+        fileChooserDescriptor.setDescription("Your selected file will be uploaded");
+        FileChooser.chooseFile(fileChooserDescriptor, null, null, callback);
+    }
+
+    private boolean extensionFilter(VirtualFile f) {
+        return f.getExtension() == "mp4";
     }
 }
